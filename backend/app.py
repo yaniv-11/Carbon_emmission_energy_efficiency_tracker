@@ -1,4 +1,4 @@
-# api.py
+# app.py
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 from flask_cors import CORS
 from model import EnergyEfficiencyModel
@@ -29,7 +29,7 @@ try:
     
     if not os.path.exists(model_path):
         logger.info("Model file not found. Training new model...")
-        dataset_path = r"C:\Users\vinays\Downloads\carbon_capture_dataset_2000_extended\carbon_capture_dataset_2000_extended.csv"
+        dataset_path = ""
         if not os.path.exists(dataset_path):
             raise FileNotFoundError(f"Dataset not found at {dataset_path}")
         model.train(dataset_path)
