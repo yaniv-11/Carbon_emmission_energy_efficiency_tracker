@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Insights - Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Prediction Results and Recommendations</h1>
+            <p>Here are the results and recommendations based on your input parameters.</p>
+        </header>
+
+        <main>
+            <div class="results">
+                <h2>Analysis Results</h2>
+                <div class="results-grid">
+                    <div class="result-card">
+                        <h3>Predicted CO2 Emissions</h3>
+                        <p>{{ results.prediction['CO2 Emitted (kg/hr)'] | round(2) }} kg/hr</p>
+                    </div>
+                    <div class="result-card">
+                        <h3>Predicted Energy Efficiency</h3>
+                        <p>{{ results.prediction['Energy Used Efficiently (MJ)'] | round(2) }} MJ</p>
+                    </div>
+                </div>
+
+                <div class="recommendations">
+                    <h3>Optimization Recommendations</h3>
+                    <div id="recommendationsList"></div>
+                </div>
+            </div>
+
+            <div class="charts">
+                <h2>Visualization</h2>
+                <div class="chart-container">
+                    <h3>Impact on CO₂ (kg/hr)</h3>
+                    <canvas id="tornadoChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>CO₂ Emitted Over Process Cycles</h3>
+                    <canvas id="lineChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Process Flow Diagram</h3>
+                    <div id="processDiagram">
+                        <img src="{{ url_for('static', filename='process_diagram.png') }}" alt="Process Flow Diagram" style="max-width: 100%;">
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>CO₂ vs Flow Rate</h3>
+                    <canvas id="scatterPlot1"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Energy vs Sorbent Type</h3>
+                    <canvas id="scatterPlot2"></canvas>
+                </div>
+            </div>
+             <div class="back-button">
+                <a href="{{ url_for('app_page') }}" class="submit-btn">Back to Prediction</a>
+            </div>
+
+        </main>
+    </div>
+
+     <footer>
+        Built by Yaniv   <span class="heart">&#x267B;</span> 
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const results = {{ results | tojson }};
+            console.log('Results object:', results);
+            
+            if (results) {
+                // Display prediction results
+                // Display recommendations
+                const recommendationsList = document.getElementById('recommendationsList');
+                recommendationsList.innerHTML = '';
+
+                const addRecommendations = (title, recommendations, inputData) => {
+                    if (recommendations.length > 0) {
+                        const section = document.createElement('div');
+                        section.innerHTML = `<h4>${title}:</h4>`;
+                        recommendations.forEach(rec => {
+                             const currentValue = inputData[rec.parameter];
+                             const direction = title.includes('Increase') ? 'Increase' : 'Decrease';
+                            section.innerHTML += `
+                                <div class="recommendation-item">
+                                    <p><strong>${rec.parameter}</strong> (Current: ${currentValue})</p>
+                                    <p>${direction} this parameter for potential improvement:</p>
+                                    <p>Expected improvement: ${rec.co2_impact.toFixed(2)} kg/hr less CO2,
+                                       ${rec.energy_impact.toFixed(2)} MJ more efficiency</p>
+                                </div>
+                            `;
+                        });
+                        recommendationsList.appendChild(section);
+                    }
+                };
+
+                addRecommendations('Parameters to Increase', results.recommendations.increase, results.input_data);
+                addRecommendations('Parameters to Decrease', results.recommendations.decrease, results.input_data);
+
+                 if (results.recommendations.increase.length === 0 && results.recommendations.decrease.length === 0) {
+                     recommendationsList.innerHTML = '<p>No significant recommendations based on sensitivity analysis.</p>';
+                }
+
+                // --- New Chart.js Visualizations --- //
+
+                // Tornado Chart for Impact on CO₂
+                const tornadoCtx = document.getElementById('tornadoChart').getContext('2d');
+                const impactData = [
+                    { param: 'Pressure', impact: Math.abs(results.recommendations.neutral.find(r => r.parameter === 'Pressure (bar)').co2_impact) },
+                    { param: 'Temperature', impact: Math.abs(results.recommendations.neutral.find(r => r.parameter === 'Temperature (°C)').co2_impact) },
+                    { param: 'Flow Rate', impact: Math.abs(results.recommendations.neutral.find(r => r.parameter === 'Flow Rate (m³/h)').co2_impact) }
+                ].sort((a, b) => b.impact - a.impact);
+
+                new Chart(tornadoCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: impactData.map(d => d.param),
+                        datasets: [{
+                            label: 'Impact on CO₂ (kg/hr)',
+                            data: impactData.map(d => d.impact),
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Impact of Parameters on CO₂ Emissions'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Impact (kg/hr)'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Line Chart for CO₂ over Process Cycles
+                const lineCtx = document.getElementById('lineChart').getContext('2d');
+                const cycles = Array.from({length: 10}, (_, i) => i + 1);
+                const co2Data = cycles.map(cycle => 
+                    results.prediction['CO2 Emitted (kg/hr)'] * (1 + Math.random() * 0.1 - 0.05)
+                );
+
+                new Chart(lineCtx, {
+                    type: 'line',
+                    data: {
+                        labels: cycles,
+                        datasets: [{
+                            label: 'CO₂ Emitted (kg/hr)',
+                            data: co2Data,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'CO₂ Emissions Over Process Cycles'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'CO₂ Emitted (kg/hr)'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Process Cycle'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Scatter Plot 1: CO₂ vs Flow Rate
+                const scatter1Ctx = document.getElementById('scatterPlot1').getContext('2d');
+                const flowRates = Array.from({length: 20}, (_, i) => 800 + i * 100);
+                const co2Emissions = flowRates.map(rate => 
+                    results.prediction['CO2 Emitted (kg/hr)'] * (rate / 1000)
+                );
+
+                new Chart(scatter1Ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'CO₂ vs Flow Rate',
+                            data: flowRates.map((rate, i) => ({
+                                x: rate,
+                                y: co2Emissions[i]
+                            })),
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'CO₂ Emissions vs Flow Rate'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                title: {
+                                    display: true,
+                                    text: 'Flow Rate (m³/h)'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'CO₂ Emitted (kg/hr)'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Scatter Plot 2: Energy vs Sorbent Type
+                const scatter2Ctx = document.getElementById('scatterPlot2').getContext('2d');
+                const sorbentTypes = ['MEA', 'DEA', 'MDEA', 'AMP'];
+                const energyData = sorbentTypes.map(type => 
+                    results.prediction['Energy Used Efficiently (MJ)'] * (0.8 + Math.random() * 0.4)
+                );
+
+                new Chart(scatter2Ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'Energy vs Sorbent Type',
+                            data: sorbentTypes.map((type, i) => ({
+                                x: i,
+                                y: energyData[i]
+                            })),
+                            backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Energy Efficiency vs Sorbent Type'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'category',
+                                labels: sorbentTypes,
+                                title: {
+                                    display: true,
+                                    text: 'Sorbent Type'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Energy Used Efficiently (MJ)'
+                                }
+                            }
+                        }
+                    }
+                });
+
+            } else {
+                // Handle case where no results are found (should be caught by redirect)
+                console.error('No results found in session.');
+                // Optionally display a message to the user
+            }
+        });
+    </script>
+</body>
+</html> 

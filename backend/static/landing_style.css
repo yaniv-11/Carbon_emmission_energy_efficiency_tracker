@@ -1,0 +1,124 @@
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --accent-color: #e74c3c;
+    --background-color: #f5f6fa;
+    --text-color: #2c3e50;
+    --border-color: #dcdde1;
+    --success-color: #27ae60;
+    --warning-color: #f1c40f;
+    --dark-purple: #1a0e2f;
+    --light-purple: #9b59b6;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    color: white;
+    background-color: var(--dark-purple);
+}
+
+.landing-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    justify-content: space-between;
+}
+
+.landing-header {
+    padding: 1.5rem 2rem;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.landing-logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.landing-main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+}
+
+.landing-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.landing-title .highlight {
+    color: var(--light-purple);
+}
+
+.landing-subtitle {
+    font-size: 1.2rem;
+    margin-bottom: 2.5rem;
+    max-width: 600px;
+    opacity: 0.9;
+}
+
+.get-started-btn {
+    display: inline-block;
+    background-color: var(--light-purple);
+    color: white;
+    padding: 1rem 2.5rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.get-started-btn:hover {
+    background-color: #8e44ad;
+}
+
+.landing-footer {
+    text-align: center;
+    padding: 1.5rem 2rem;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.landing-footer .heart {
+    color: var(--accent-color);
+}
+
+@media (max-width: 768px) {
+    .landing-header {
+        padding: 1rem;
+    }
+
+    .landing-logo {
+        font-size: 1.3rem;
+    }
+
+    .landing-title {
+        font-size: 2.5rem;
+    }
+
+    .landing-subtitle {
+        font-size: 1rem;
+    }
+
+    .get-started-btn {
+        padding: 0.8rem 2rem;
+        font-size: 1rem;
+    }
+
+    .landing-footer {
+        padding: 1rem;
+    }
+} 

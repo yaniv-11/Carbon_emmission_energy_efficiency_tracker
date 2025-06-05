@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Insights - Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- You might want to add an icon library here for the input icons (e.g., Font Awesome) -->
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> -->
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Prediction Parameters</h1>
+            <p>Adjust the parameters below to see the AI-driven predictions for CO2 emissions and energy efficiency.</p>
+        </header>
+
+        <main>
+            <form id="predictionForm">
+                <h2>Input Parameters</h2>
+                <p>Adjust the parameters below to predict CO2 emissions and energy efficiency.</p>
+
+                <div class="form-section">
+                    <h3>Primary Parameters</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="temperature">Temperature (°C)</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">°C</span> <!-- Placeholder for temperature icon -->
+                                <input type="number" id="temperature" name="Temperature (°C)" value="85" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="pressure">Pressure (bar)</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon"> &#x2191; </span> <!-- Placeholder for pressure icon (using Devanagari syllable for pressure) -->
+                                <input type="number" id="pressure" name="Pressure (bar)" value="5" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="co2Concentration">CO2 Concentration (%)</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">CO₂</span> <!-- Placeholder for CO2 icon -->
+                                <input type="number" id="co2Concentration" name="CO2 Concentration (%)" value="12" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="flowRate">Flow Rate (m³/h)</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon"> &#x21F2; </span> <!-- Placeholder for flow rate icon -->
+                                <input type="number" id="flowRate" name="Flow Rate (m³/h)" value="1000" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="solventConcentration">Solvent Concentration (%)</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon"> &#x2697; </span> <!-- Placeholder for solvent icon -->
+                                <input type="number" id="solventConcentration" name="Solvent Concentration (%)" value="30" required>
+                            </div>
+                        </div>
+                         <div class="form-group">
+                            <label for="Sorbent Type">Sorbent Type</label>
+                            <div class="input-wrapper">
+                                <select id="Sorbent Type" name="Sorbent Type" required>
+                                    {% for sorbent in sorbent_types %}
+                                    <option value="{{ sorbent }}">{{ sorbent }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section secondary-parameters">
+                    <h3 class="collapsible-header">Secondary Parameters <span class="collapse-icon">&#x25BC;</span></h3> <!-- Down arrow icon -->
+                    <div class="collapsible-content hidden">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="captureEfficiency">Capture Efficiency (%)</label>
+                                <div class="input-wrapper">
+                                    <span class="input-icon"> &#x25CF; </span> <!-- Placeholder for efficiency icon -->
+                                    <input type="number" id="captureEfficiency" name="Capture Efficiency (%)" value="85" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="energyConsumption">Energy Consumption (MJ/kg CO2)</label>
+                                <div class="input-wrapper">
+                                    <span class="input-icon"> &#x26A1; </span> <!-- Placeholder for energy icon -->
+                                    <input type="number" id="energyConsumption" name="Energy Consumption (MJ/kg CO2)" value="2.5" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="co2Outlet">CO2 Outlet Concentration (%)</label>
+                                <div class="input-wrapper">
+                                    <span class="input-icon"> &raquo; </span> <!-- Placeholder for CO2 outlet icon -->
+                                    <input type="number" id="co2Outlet" name="CO2 Outlet Concentration (%)" value="2" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="columnHeight">Column Height (m)</label>
+                                 <div class="input-wrapper">
+                                    <span class="input-icon"> &#x2302; </span> <!-- Placeholder for column height icon -->
+                                    <input type="number" id="columnHeight" name="Column Height (m)" value="10" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="cycleTime">Cycle Time (min)</label>
+                                <div class="input-wrapper">
+                                    <span class="input-icon"> &#x231A; </span> <!-- Placeholder for cycle time icon -->
+                                    <input type="number" id="cycleTime" name="Cycle Time (min)" value="30" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="poreSize">Pore Size (nm)</label>
+                                <div class="input-wrapper">
+                                    <span class="input-icon"> &#x269B; </span> <!-- Placeholder for pore size icon -->
+                                    <input type="number" id="poreSize" name="Pore Size (nm)" value="50" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section advanced-parameters">
+                    <h3 class="collapsible-header">Advanced Parameters <span class="collapse-icon">&#x25BC;</span></h3> <!-- Down arrow icon -->
+                     <div class="collapsible-content hidden">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="reactorVolume">Reactor Volume (m³)</label>
+                                 <div class="input-wrapper">
+                                    <span class="input-icon"> &#x29C9; </span> <!-- Placeholder for reactor volume icon -->
+                                    <input type="number" id="reactorVolume" name="Reactor Volume (m³)" value="5" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="reboilerDuty">Reboiler Duty (kW)</label>
+                                 <div class="input-wrapper">
+                                    <span class="input-icon"> &#x26A1; </span> <!-- Placeholder for reboiler icon -->
+                                    <input type="number" id="reboilerDuty" name="Reboiler Duty (kW)" value="100" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="regenerationTemp">Regeneration Temp (°C)</label>
+                                <div class="input-wrapper">
+                                    <span class="input-icon">°C</span> <!-- Placeholder for regeneration temp icon -->
+                                    <input type="number" id="regenerationTemp" name="Regeneration Temp (°C)" value="120" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="residenceTime">Residence Time (s)</label>
+                                 <div class="input-wrapper">
+                                    <span class="input-icon"> &#x23F1; </span> <!-- Placeholder for residence time icon -->
+                                    <input type="number" id="residenceTime" name="Residence Time (s)" value="60" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="stability">Stability (1-10)</label>
+                                <div class="input-wrapper">
+                                    <span class="input-icon"> &#x269C; </span> <!-- Placeholder for stability icon -->
+                                    <input type="number" id="stability" name="Stability (1-10)" min="1" max="10" value="8" required>
+                                </div>
+                            </div>
+                             <div class="form-group">
+                                <label for="surfaceArea">Surface Area (m²/g)</label>
+                                <div class="input-wrapper">
+                                    <span class="input-icon"> &#x25A1; </span> <!-- Placeholder for surface area icon -->
+                                    <input type="number" id="surfaceArea" name="Surface Area (m²/g)" value="200" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="phLevel">pH Level</label>
+                                <div class="input-wrapper">
+                                    <span class="input-icon">pH</span> <!-- Placeholder for pH icon -->
+                                    <input type="number" id="phLevel" name="pH Level" value="7" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Predict</button>
+            </form>
+
+            <div id="results" class="results hidden">
+                <h2>Analysis Results</h2>
+                <div class="results-grid">
+                    <div class="result-card">
+                        <h3>CO2 Emissions</h3>
+                        <p id="co2Emitted">-</p>
+                    </div>
+                    <div class="result-card">
+                        <h3>Energy Efficiency</h3>
+                        <p id="energyEfficiency">-</p>
+                    </div>
+                </div>
+
+                <div class="recommendations">
+                    <h3>Optimization Recommendations</h3>
+                    <div id="recommendationsList"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        Built by Yaniv   <span class="heart">&#x267B;</span> 
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const collapsibleHeaders = document.querySelectorAll('.collapsible-header');
+
+            collapsibleHeaders.forEach(header => {
+                header.style.cursor = 'pointer'; // Add pointer cursor to indicate clickability
+                header.addEventListener('click', () => {
+                    const content = header.nextElementSibling;
+                    const icon = header.querySelector('.collapse-icon');
+
+                    if (content.classList.contains('hidden')) {
+                        content.classList.remove('hidden');
+                        icon.style.transform = 'rotate(180deg)'; // Rotate arrow up
+                    } else {
+                        content.classList.add('hidden');
+                        icon.style.transform = 'rotate(0deg)'; // Rotate arrow down
+                    }
+                });
+            });
+
+            // Ensure Primary Parameters are visible on load and others are hidden
+            // Find the collapsible content div within the first form-section (Primary Parameters)
+            const primaryParamsContent = document.querySelector('.form-section:first-child .collapsible-content');
+            if (primaryParamsContent) {
+                primaryParamsContent.classList.remove('hidden');
+                // Set the initial state of the icon for Primary Parameters (should be pointing up)
+                const primaryParamsIcon = document.querySelector('.form-section:first-child .collapse-icon');
+                if (primaryParamsIcon) {
+                     primaryParamsIcon.style.transform = 'rotate(180deg)'; // Primary is open, icon up
+                }
+            }
+
+             document.querySelector('.form-section.secondary-parameters .collapsible-content').classList.add('hidden');
+             document.querySelector('.form-section.advanced-parameters .collapsible-content').classList.add('hidden');
+
+             // Set the initial state of the icons for collapsed sections
+             document.querySelectorAll('.form-section:not(:first-child) .collapse-icon').forEach(icon => {
+                 icon.style.transform = 'rotate(0deg)'; // Secondary and Advanced are closed, icons down
+             });
+
+        });
+
+        document.getElementById('predictionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const data = {};
+            formData.forEach((value, key) => {
+                // Convert string values to numbers, except for Sorbent Type
+                if (key !== 'Sorbent Type') {
+                    data[key] = parseFloat(value);
+                } else {
+                    data[key] = value;
+                }
+            });
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                // Check if the response is OK (status code 2xx)
+                if (!response.ok) {
+                    // If not OK, try to parse the error details from the response body
+                    if (result.details) {
+                         alert(`Error: ${result.error}\nDetails:\n${result.details}`);
+                    } else {
+                        alert(`Error: ${result.error || 'An error occurred while processing your request'}`);
+                    }
+                     // Hide results section if there's an error
+                    document.getElementById('results').classList.add('hidden');
+                    return; // Stop further processing on error
+                }
+
+                // If the response contains a redirect URL, navigate to it
+                if (result.redirect) {
+                    window.location.href = result.redirect;
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert(error.message || 'An unexpected error occurred. Please check the console for more details.');
+                 document.getElementById('results').classList.add('hidden'); // Hide results on unexpected error
+            }
+        });
+    </script>
+</body>
+</html> 
