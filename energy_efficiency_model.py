@@ -306,7 +306,7 @@ def main():
     model = EnergyEfficiencyModel()
     
     # Train the model with your dataset
-    model.train(r"C:\Users\vinays\Downloads\carbon_capture_dataset_2000_extended\carbon_capture_dataset_2000_extended.csv")
+    model.train("dataset_path")
     
     # Example input for prediction
     sample_input = {
